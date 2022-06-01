@@ -34,32 +34,35 @@ class App extends React.Component {
    * Submit data to API
    */
   submitForm(e) {
-    try {
-      fetch(azureApiUrl, {
-        method: 'POST',
-        headers: {},
-        body: JSON.stringify({
-          building: {
-            bl_id: this.state.buildingId,
-            name: {
-              contains: this.state.buildingName
-            }
-          },
-          floor: {
-            fl_id: this.state.floorId,
-            name: this.state.floorName
-          },
-          flat_file: this.state.isFlatFile,
-          file_type: this.state.fileType,
-        })
-      }).then(res => {
-        console.log(res);
-        console.log('test');
-        this.setState({ result: res });
-      });
-    } catch (e) {
+    fetch(azureApiUrl, {
+      method: 'POST',
+      headers: {},
+      body: JSON.stringify({
+        building: {
+          bl_id: this.state.buildingId,
+          name: {
+            contains: this.state.buildingName
+          }
+        },
+        floor: {
+          fl_id: this.state.floorId,
+          name: this.state.floorName
+        },
+        flat_file: this.state.isFlatFile,
+        file_type: this.state.fileType,
+      })
+    }).then(res => {
+      console.log(res);
+      console.log('test');
+      if (res.status >= 300) {
+        this.setState({ result: `${res.status >= 500 ? 'Server ': ''}Error ${res.status}: ${res.statusText}` });
+      } else {
+        this.setState({ result: res.text() });
+      }
+    }).catch(e => {
       console.log(e);
-    }
+      this.setState({ result: e });
+    });
     e.preventDefault();
   };
 
@@ -91,6 +94,10 @@ class App extends React.Component {
       );
     });
 
+    const result = typeof this.state.result === 'string' ?
+      <h2>{this.state.result}</h2> :
+      <h3>{JSON.stringify(this.state.result)}</h3>;
+
     return (
       <div className="App">
         <header className="App-header">
@@ -108,7 +115,7 @@ class App extends React.Component {
           </div>
           <div>
             <h1>Results</h1>
-            {JSON.stringify(this.state.result)}
+            {result}
           </div>
         </body>
       </div>
