@@ -61,6 +61,10 @@ class App extends React.Component {
         this.setState({ result: `${res.status >= 500 ? 'Server ': ''}Error ${res.status}: ${res.statusText}` });
       } else {
         res.text().then(text => {
+          // if string is array, parse it
+          if (text.startsWith('[')) {
+            text = JSON.parse(text);
+          }
           this.setState({ result: text });
         });
       }
@@ -82,6 +86,25 @@ class App extends React.Component {
     });
   }
 
+  jsonListToTable(jsonList) {
+    if (!jsonList || !jsonList.length) return '';
+
+    return (
+      <table>
+        <thead>
+          <tr>
+            {Object.keys(jsonList[0]).map((key) => <th key={key}>{key}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {jsonList.map((row) => <tr key={row.id}>
+            {Object.keys(row).map((key) => <td key={key}>{row[key]}</td>)}
+          </tr>)}
+        </tbody>
+      </table>
+    );
+  }
+
   render() {
     // Dynamically render form based on FormMetadata
     const form = FormMetadata.map((field) => {
@@ -98,10 +121,10 @@ class App extends React.Component {
         </div>
       );
     });
-
+    
     const result = typeof this.state.result === 'string' ?
       <h2>{this.state.result}</h2> :
-      <h3>{JSON.stringify(this.state.result)}</h3>;
+      <h3>{this.jsonListToTable(this.state.result || [])}</h3>;
 
     return (
       <div className="App">
@@ -125,6 +148,7 @@ class App extends React.Component {
           </div>
           <div>
             <h1>Results</h1>
+            <h2>{result.length ? `${result.length} Records` : ''}</h2>
             {result}
           </div>
         </body>
