@@ -10,7 +10,7 @@ const FormMetadata = [
   { name: 'floorId', label: 'Floor ID', type: 'text' },
   { name: 'floorName', label: 'Floor Name', type: 'text' },
   { name: 'fileType', label: 'File Type', type: 'dropdown', options: ['json', 'pdf', 'csv'] },
-  { name: 'isFlatFile', label: 'Flat File?', type: 'dropdown', visibility: 'hidden', options: ['true', 'false'] },
+  { name: 'isFlatFile', label: 'Flat File?', type: 'dropdown', visibility: 'hidden', options: ['yes', 'no'] },
 ];
 
 class App extends React.Component {
@@ -23,7 +23,7 @@ class App extends React.Component {
         floorId: '',
         floorName: '',
         fileType: '',
-        isFlatFile: '',
+        isFlatFile: 'no',
       },
       result: ''
      };
@@ -110,7 +110,7 @@ class App extends React.Component {
     // Dynamically render form based on FormMetadata
     const form = FormMetadata.map((field) => {
       return (
-        <div className="form-group" key={field.name}>
+        <div className="form-group" key={field.name} style={{visibility: field.visibility || 'visible'}}>
           <label>{field.label} &nbsp;</label>
           {field.type === 'text' ?
             <input name={field.name} type="text" className="form-control" value={this.state.formData[field.name]} onChange={this.handleFormChange} />
