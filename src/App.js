@@ -10,7 +10,7 @@ const FormMetadata = [
   { name: 'floorId', label: 'Floor ID', type: 'text' },
   { name: 'floorName', label: 'Floor Name', type: 'text' },
   { name: 'fileType', label: 'File Type', type: 'dropdown', options: ['json', 'pdf', 'csv'] },
-  { name: 'isFlatFile', label: 'Flat File?', type: 'dropdown', visibility: 'hidden', options: ['yes', 'no'] },
+  { name: 'isFlatFile', label: 'Flat File?', type: 'dropdown', visibility: 'visible', options: ['yes', 'no'] },
 ];
 
 class App extends React.Component {
@@ -100,7 +100,18 @@ class App extends React.Component {
 
   jsonListToTable(jsonList) {
     if (!jsonList || !jsonList.length) return '';
-
+    console.log('[DEBUG] jsonListToTable');
+    console.log(jsonList);
+    // Deal with nested arrays
+    // Prevent recalculating & re-evaluating conditionals if not necessary
+    // (such as having flat file setting)
+    // If necessary in the future, remove the conditional to just flatten all
+    // non-flat arrays (not good for performance)
+    const getCellValue = this.state.formData.isFlatFile === 'no' ?
+      value => {
+        return !value ? '--' : Array.isArray(value) ? JSON.stringify(value) : value;
+      } :
+      value => value
     return (
       <table>
         <thead>
@@ -110,7 +121,14 @@ class App extends React.Component {
         </thead>
         <tbody>
           {jsonList.map((row) => <tr key={row.id}>
-            {Object.keys(row).map((key) => <td key={key}>{row[key]}</td>)}
+            {Object.keys(row).map(key => {
+              return (
+                <td key={key}>
+                  {getCellValue(row[key])}
+                </td>
+              );
+            }
+            )}
           </tr>)}
         </tbody>
       </table>
