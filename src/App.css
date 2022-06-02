@@ -56,6 +56,7 @@ table, th, td {
 }
 
 .form-group {
+  font-size: 1.25em;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -63,4 +64,8 @@ table, th, td {
 }
 .form-group label {
   margin: .25em;
+}
+button {
+  font-size: 1.25em;
+  padding: .33em;
 }

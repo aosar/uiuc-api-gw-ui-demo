@@ -22,10 +22,11 @@ class App extends React.Component {
         buildingName: '',
         floorId: '',
         floorName: '',
-        fileType: '',
+        fileType: 'json',
         isFlatFile: 'no',
       },
-      result: ''
+      result: '',
+      isLoading: false
      };
     this.handleFormChange = this.handleFormChange.bind(this);
     this.submitForm = this.submitForm.bind(this);
@@ -36,6 +37,7 @@ class App extends React.Component {
    * TODO if maintaining: dont use callbacks if possible
    */
   submitForm(e) {
+    this.setState({ isLoading: true });
     fetch(azureApiUrl, {
       method: 'POST',
       headers: {
@@ -56,6 +58,7 @@ class App extends React.Component {
         file_type: this.state.fileType,
       })
     }).then(res => {
+      this.setState({ isLoading: false });
       console.log(res);
       console.log('test');
       if (res.status >= 300) {
@@ -77,7 +80,7 @@ class App extends React.Component {
   };
 
   handleFormChange(e) {
-    console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
+    // console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
     // console.log(e);
     const target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -106,22 +109,45 @@ class App extends React.Component {
     );
   }
 
+  /**
+   * Dynamically render form based on FormMetadata
+   * Metadata Structure:
+   * name: string -- corresponds to name in state.formData
+   * label: string
+   * type: string  -- oneOf: text, dropdown, checkbox
+   * visibility?: string -- oneOf: hidden, visible
+   * options?: array
+   * @param {array} formMetadata
+   */
+  renderForm(formMetadata) {
+    return formMetadata.map(field => (
+      <div className="form-group" key={field.name} style={{ visibility: field.visibility || 'visible' }}>
+        <label>{field.label} &nbsp;</label>
+        {field.type === 'text' ?
+          <input
+            name={field.name}
+            type="text"
+            className="form-control"
+            value={this.state.formData[field.name]}
+            onChange={this.handleFormChange}
+          /> : null
+        }
+        {field.type === 'dropdown' ?
+          <select
+            name={field.name}
+            className="form-control"
+            value={this.state.formData[field.name]}
+            onChange={this.handleFormChange}
+          >
+            {field.options.map(option => <option key={option}>{option}</option>)}
+          </select> : null
+        }
+      </div>
+    ));
+  }
+
   render() {
-    // Dynamically render form based on FormMetadata
-    const form = FormMetadata.map((field) => {
-      return (
-        <div className="form-group" key={field.name} style={{visibility: field.visibility || 'visible'}}>
-          <label>{field.label} &nbsp;</label>
-          {field.type === 'text' ?
-            <input name={field.name} type="text" className="form-control" value={this.state.formData[field.name]} onChange={this.handleFormChange} />
-            : null
-          }
-          {field.type === 'dropdown' ? <select className="form-control">
-            {field.options.map((option) => <option key={option}>{option}</option>)}
-          </select> : null}
-        </div>
-      );
-    });
+    const form = this.renderForm(FormMetadata);
 
     const rawResult = this.state.result;
     
@@ -151,7 +177,7 @@ class App extends React.Component {
           </div>
           <div>
             <h1>Results {(!!rawResult && typeof rawResult !== 'string') ? `(${rawResult.length} Records)` : ''}</h1>
-            {result}
+            {this.state.isLoading ? <h2>Loading...</h2> : result}
           </div>
         </body>
       </div>
