@@ -25,6 +25,7 @@ class App extends React.Component {
         fileType: '',
         isFlatFile: '',
       },
+      result: ''
      };
     this.handleFormChange = this.handleFormChange.bind(this);
     this.submitForm = this.submitForm.bind(this);
@@ -121,9 +122,11 @@ class App extends React.Component {
         </div>
       );
     });
+
+    const rawResult = this.state.result;
     
     const result = typeof this.state.result === 'string' ?
-      <h2>{this.state.result}</h2> :
+      <h2>{rawResult}</h2> :
       <h3>{this.jsonListToTable(this.state.result || [])}</h3>;
 
     return (
@@ -147,8 +150,7 @@ class App extends React.Component {
             <button onClick={this.submitForm}>Submit</button>
           </div>
           <div>
-            <h1>Results</h1>
-            <h2>{result.length ? `${result.length} Records` : ''}</h2>
+            <h1>Results {(!!rawResult && typeof rawResult !== 'string') ? `(${rawResult.length} Records)` : ''}</h1>
             {result}
           </div>
         </body>
