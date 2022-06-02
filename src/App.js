@@ -32,11 +32,14 @@ class App extends React.Component {
   }
   /**
    * Submit data to API
+   * TODO if maintaining: dont use callbacks if possible
    */
   submitForm(e) {
     fetch(azureApiUrl, {
       method: 'POST',
-      headers: {},
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         building: {
           bl_id: this.state.buildingId,
@@ -57,7 +60,9 @@ class App extends React.Component {
       if (res.status >= 300) {
         this.setState({ result: `${res.status >= 500 ? 'Server ': ''}Error ${res.status}: ${res.statusText}` });
       } else {
-        this.setState({ result: res.text() });
+        res.text().then(text => {
+          this.setState({ result: text });
+        });
       }
     }).catch(e => {
       console.log(e);
