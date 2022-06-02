@@ -38,26 +38,33 @@ class App extends React.Component {
    */
   submitForm(e) {
     this.setState({ isLoading: true });
+    const formData = this.state.formData;
+    // Map state values to API specs
+    const requestBody = {
+      building: {
+        bl_id: formData.buildingId,
+        name: {
+          contains: formData.buildingName
+        }
+      },
+      floor: {
+        fl_id: formData.floorId,
+        name: formData.floorName
+      },
+      flat_file: formData.isFlatFile,
+      file_type: formData.fileType,
+    };
+    console.log('[DEBUG] request body:');
+    console.log(requestBody);
+
     fetch(azureApiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        building: {
-          bl_id: this.state.buildingId,
-          name: {
-            contains: this.state.buildingName
-          }
-        },
-        floor: {
-          fl_id: this.state.floorId,
-          name: this.state.floorName
-        },
-        flat_file: this.state.isFlatFile,
-        file_type: this.state.fileType,
-      })
-    }).then(res => {
+      body: JSON.stringify(requestBody)
+    })
+    .then(res => {
       this.setState({ isLoading: false });
       console.log(res);
       console.log('test');
@@ -72,7 +79,8 @@ class App extends React.Component {
           this.setState({ result: text });
         });
       }
-    }).catch(e => {
+    })
+    .catch(e => {
       console.log(e);
       this.setState({ result: e });
     });
@@ -80,7 +88,7 @@ class App extends React.Component {
   };
 
   handleFormChange(e) {
-    // console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
+    console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
     // console.log(e);
     const target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
