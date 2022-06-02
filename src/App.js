@@ -106,8 +106,13 @@ class App extends React.Component {
           </p>
         </header>
         <body className='App-body'>
-          <div>
-            <h1>Note: This is a demo site</h1>
+          <div className="disclaimer-header">
+            <h4>
+              This web application is developed as a proof-of-concept for the campus Business Initiative.   It is used to
+              demonstrate the ability to access campus resources via a cloud based API using Microsoft's Azure API Gateway
+              product.  Use of this application for any production purpose is not approved.  No guarantees of continual
+              availability or fitness for any purpose other than demonstrating a concept are made.
+            </h4>
           </div>
           <div>
             {form}
