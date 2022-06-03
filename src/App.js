@@ -7,11 +7,17 @@ const azureApiUrl = config.azure_api_url;
 const FormMetadata = [
   { name: 'buildingId', label: 'Building ID', type: 'text' },
   { name: 'buildingName', label: 'Building Name', type: 'text' },
+  { name: 'bannerName', label: 'Banner Name', type: 'text' },
   { name: 'floorId', label: 'Floor ID', type: 'text' },
   { name: 'floorName', label: 'Floor Name', type: 'text' },
-  { name: 'fileType', label: 'File Type', type: 'dropdown', options: ['json', 'pdf', 'csv'] },
-  { name: 'isFlatFile', label: 'Flat File?', type: 'dropdown', visibility: 'visible', options: ['yes', 'no'] },
+  { name: 'fileType', label: 'File Type', type: 'dropdown', options: ['json', 'pdf', 'csv'], default: 'json' },
+  { name: 'isFlatFile', label: 'Flat File?', type: 'dropdown', visibility: 'visible', options: ['yes', 'no'], default: 'yes' }
 ];
+
+const DefaultFormState = FormMetadata.reduce((state, field) => ({
+  ...state,
+  [field.name]: field.default || '',
+}), {});
 
 class App extends React.Component {
   constructor(props) {
@@ -23,7 +29,7 @@ class App extends React.Component {
         floorId: '',
         floorName: '',
         fileType: 'json',
-        isFlatFile: 'no',
+        isFlatFile: 'yes',
       },
       result: '',
       isLoading: false
@@ -43,7 +49,8 @@ class App extends React.Component {
         bl_id: formData.buildingId,
         name: {
           contains: formData.buildingName
-        }
+        },
+        banner_name_abrev: formData.bannerName
       },
       floor: {
         fl_id: formData.floorId,
@@ -115,6 +122,14 @@ class App extends React.Component {
       formData: {...prevState.formData, [name]: value }
     }));
   }
+
+  clearForm = e => {
+    e.preventDefault();
+    this.setState(prevState => ({
+      formData: DefaultFormState,
+      result: ''
+    }));
+  };
 
   jsonListToTable = jsonList => {
     if (!jsonList || !jsonList.length) return '';
@@ -225,6 +240,7 @@ class App extends React.Component {
           <div>
             {form}
             <button onClick={this.submitForm}>Submit</button>
+            <button className='pad-left' onClick={this.clearForm} disabled={isLoading}>Clear</button>
           </div>
           <div>
             <h1>
