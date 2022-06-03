@@ -6,13 +6,14 @@ import React from 'react';
 // Option 2: env variable azure_api_url
 // (Doing try catch because if env variable is null AND
 // config file doesnt exist then it blows up anyways)
-const azureApiUrl = (() => {
-  try {
-    return require('./config.json').azure_api_url;
-  } catch (e) {
-    return process.env.azure_api_url;
-  }
-})();
+const azureApiUrl = process.env.azure_api_url;
+// (() => {
+//   try {
+//     return require('./config.json').azure_api_url;
+//   } catch (e) {
+//     return process.env.azure_api_url;
+//   }
+// })();
 
 const FormMetadata = [
   { name: 'buildingId', label: 'Building ID', type: 'text' },
