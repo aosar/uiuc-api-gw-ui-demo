@@ -69,3 +69,8 @@ button {
   font-size: 1.25em;
   padding: .33em;
 }
+
+button.download {
+  font-size: .75em !important; /* temp: this is thrown in a header */
+  margin-left: 2em;
+}

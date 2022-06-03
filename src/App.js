@@ -85,6 +85,26 @@ class App extends React.Component {
     e.preventDefault();
   };
 
+  /**
+   * Download JSON as CSV
+   * TODO: Handle nested objects
+   */
+  downloadJsonAsCsv = () => {
+    const data = this.state.result;
+    const csv = data.map(item => {
+      return Object.keys(item).map(key => {
+        return item[key];
+      }).join(',');
+    }).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'data.csv';
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
   handleFormChange = e => {
     console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
     // console.log(e);
@@ -178,7 +198,7 @@ class App extends React.Component {
     const result = typeof this.state.result === 'string' ?
       <h2>{rawResult}</h2> :
       <h3>{this.jsonListToTable(this.state.result || [])}</h3>;
-
+    const resultHasJson = !!rawResult && typeof rawResult !== 'string';
     return (
       <div className="App">
         <header className="App-header">
@@ -200,8 +220,17 @@ class App extends React.Component {
             <button onClick={this.submitForm}>Submit</button>
           </div>
           <div>
-            <h1>Results {(!!rawResult && typeof rawResult !== 'string') ? `(${rawResult.length} Records)` : ''}</h1>
+            <h1>
+              {resultHasJson ? `Results (${rawResult.length} Records)` : ''}
+              {resultHasJson ?
+                <button className='download' onClick={this.downloadJsonAsCsv}>
+                  Download as CSV
+                </button>
+                : ''
+              }
+            </h1>
             {this.state.isLoading ? <h2>Loading...</h2> : result}
+            
           </div>
         </body>
       </div>
