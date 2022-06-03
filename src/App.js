@@ -111,9 +111,9 @@ class App extends React.Component {
     const target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-    this.setState({
-      formData: {[name]: value }
-    });
+    this.setState(prevState => ({
+      formData: {...prevState.formData, [name]: value }
+    }));
   }
 
   jsonListToTable = jsonList => {
@@ -125,11 +125,14 @@ class App extends React.Component {
     // (such as having flat file setting)
     // If necessary in the future, remove the conditional to just flatten all
     // non-flat arrays (not good for performance)
-    const getCellValue = this.state.formData.isFlatFile === 'no' ?
-      value => {
+    const getCellValue = value => {
         return !value ? '--' : Array.isArray(value) ? JSON.stringify(value) : value;
-      } :
-      value => value
+      }
+    // const getCellValue = this.state.formData.isFlatFile === 'no' ?
+    //   value => {
+    //     return !value ? '--' : Array.isArray(value) ? JSON.stringify(value) : value;
+    //   } :
+    //   value => value
     return (
       <table>
         <thead>
@@ -191,14 +194,18 @@ class App extends React.Component {
   }
 
   render() {
+    const rawResult = this.state.result;
+    const resultHasJson = !!rawResult && typeof rawResult !== 'string';
+    const isLoading = this.state.isLoading;
+    const showResult = resultHasJson && !isLoading;
+    
     const form = this.renderForm(FormMetadata);
 
-    const rawResult = this.state.result;
-    
+    // TODO: dont rerender table until form is submitted again
     const result = typeof this.state.result === 'string' ?
       <h2>{rawResult}</h2> :
       <h3>{this.jsonListToTable(this.state.result || [])}</h3>;
-    const resultHasJson = !!rawResult && typeof rawResult !== 'string';
+
     return (
       <div className="App">
         <header className="App-header">
@@ -221,16 +228,15 @@ class App extends React.Component {
           </div>
           <div>
             <h1>
-              {resultHasJson ? `Results (${rawResult.length} Records)` : ''}
-              {resultHasJson ?
+              {showResult ? `Results (${rawResult.length} Records)` : ''}
+              {showResult ?
                 <button className='download' onClick={this.downloadJsonAsCsv}>
                   Download as CSV
                 </button>
                 : ''
               }
             </h1>
-            {this.state.isLoading ? <h2>Loading...</h2> : result}
-            
+            {isLoading ? <h2>Loading...</h2> : result}
           </div>
         </body>
       </div>
