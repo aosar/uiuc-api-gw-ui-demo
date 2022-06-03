@@ -28,15 +28,13 @@ class App extends React.Component {
       result: '',
       isLoading: false
      };
-    this.handleFormChange = this.handleFormChange.bind(this);
-    this.submitForm = this.submitForm.bind(this);
     
   }
   /**
    * Submit data to API
    * TODO if maintaining: dont use callbacks if possible
    */
-  submitForm(e) {
+  submitForm = e => {
     this.setState({ isLoading: true });
     const formData = this.state.formData;
     // Map state values to API specs
@@ -87,7 +85,7 @@ class App extends React.Component {
     e.preventDefault();
   };
 
-  handleFormChange(e) {
+  handleFormChange = e => {
     console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
     // console.log(e);
     const target = e.target;
@@ -98,7 +96,7 @@ class App extends React.Component {
     });
   }
 
-  jsonListToTable(jsonList) {
+  jsonListToTable = jsonList => {
     if (!jsonList || !jsonList.length) return '';
     console.log('[DEBUG] jsonListToTable');
     console.log(jsonList);
@@ -145,7 +143,7 @@ class App extends React.Component {
    * options?: array
    * @param {array} formMetadata
    */
-  renderForm(formMetadata) {
+  renderForm = formMetadata => {
     return formMetadata.map(field => (
       <div className="form-group" key={field.name} style={{ visibility: field.visibility || 'visible' }}>
         <label>{field.label} &nbsp;</label>
