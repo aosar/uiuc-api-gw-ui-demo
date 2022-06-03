@@ -59,8 +59,6 @@ class App extends React.Component {
       flat_file: formData.isFlatFile,
       file_type: formData.fileType,
     };
-    console.log('[DEBUG] request body:');
-    console.log(requestBody);
 
     fetch(azureApiUrl, {
       method: 'POST',
@@ -71,8 +69,6 @@ class App extends React.Component {
     })
     .then(res => {
       this.setState({ isLoading: false });
-      console.log(res);
-      console.log('test');
       if (res.status >= 300) {
         this.setState({ result: `${res.status >= 500 ? 'Server ': ''}Error ${res.status}: ${res.statusText}` });
       } else {
@@ -86,7 +82,6 @@ class App extends React.Component {
       }
     })
     .catch(e => {
-      console.log(e);
       this.setState({ result: e });
     });
     e.preventDefault();
@@ -113,8 +108,6 @@ class App extends React.Component {
   }
 
   handleFormChange = e => {
-    console.log(`changing state for ${e.target.name} to ${e.target.value} from ${this.state.formData[e.target.name]}`);
-    // console.log(e);
     const target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
@@ -133,8 +126,6 @@ class App extends React.Component {
 
   jsonListToTable = jsonList => {
     if (!jsonList || !jsonList.length) return '';
-    console.log('[DEBUG] jsonListToTable');
-    console.log(jsonList);
     // Deal with nested arrays
     // Prevent recalculating & re-evaluating conditionals if not necessary
     // (such as having flat file setting)
